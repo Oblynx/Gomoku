@@ -11,19 +11,18 @@ public class Tile implements Cloneable
 		mark=mark0;
 		playerId=plId0;
 	}
-	/// All get methods follow the form _<property>()
-	/// and all set methods <property>_(newValue)
-	public int _id() {return id;}
-	public void id_(int a) {id=a;}
-	public int _x() {return x;}
-	public void x_(int a) {x=a;}
-	public int _y() {return y;}
-	public void y_(int a) {y=a;}
-	public int _color() {return color;}
-	public void color_(int a) {color=a;}
-	public int _playerId() {return playerId;}
-	public void playerId_(int a) {playerId=a;}
-	public boolean _mark() {return mark;}
-	public void mark_(boolean a) {mark=a;}
+	
+	public int getId() {return id;}
+	public void setId(int a) {id=a;}
+	public int getX() {return x;}
+	public void setX(int a) {x=a;}
+	public int getY() {return y;}
+	public void setY(int a) {y=a;}
+	public int getColor() {return color;}
+	public void setColor(int a) {color=a;}
+	public int getPlayerId() {return playerId;}
+	public void setPlayerId(int a) {playerId=a;}
+	public boolean getMark() {return mark;}
+	public void setMark(boolean a) {mark=a;}
 	
 }
