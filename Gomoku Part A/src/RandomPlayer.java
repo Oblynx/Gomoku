@@ -14,8 +14,6 @@ public class RandomPlayer implements AbstractPlayer
 	score = score0;
     }
 
-    ///All get methods follow the form _<property>()
-    ///and all set methods <property>_(newValue)
     public int getId() {return id;}
     public void setId(int a) {id=a;}
     public String getName() {return name;}
@@ -26,8 +24,8 @@ public class RandomPlayer implements AbstractPlayer
 	int[] xy = new int[2];
 
 	do {
-	    xy[0] = (int)(Math.random()*15);
-	    xy[1] = (int)(Math.random()*15);
+	    xy[0] = (int)(Math.random()*GomokuUtilities.NUMBER_OF_COLUMNS);
+	    xy[1] = (int)(Math.random()*GomokuUtilities.NUMBER_OF_ROWS);
 	}while (board.getTile(xy[0],xy[1]).getColor() != 0 );
 	
 	return xy;
