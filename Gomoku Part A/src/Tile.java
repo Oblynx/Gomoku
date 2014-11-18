@@ -1,3 +1,9 @@
+/*
+AEM : 7972 / 7899
+Tel : 6998581293 / Den exo
+email : kisamara@auth.gr / kipoujr@hotmail.com
+Onomata : Konstantinos Samaras Tsakiris / Kipouridis Vangelis
+*/
  
 public class Tile implements Cloneable
 {
