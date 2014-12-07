@@ -127,7 +127,7 @@ for(int x=0; x<GomokuUtilities.NUMBER_OF_COLUMNS; x++){
 	  //These are the highest priority positions
 	  if (makesNTuples(5, x,y,board, id) >= 1) return Integer.MAX_VALUE;
 	  if (makesNTuples(5, x,y,board, oppID()) >= 1) return Integer.MAX_VALUE-1;
-	  
+	  	  
 	  // Check some predefined features of the position that contribute to its score
 	  //The domination difference in range-2 area of (x,y), domain [-10,10]
 	  double range2DColor= (GomokuUtilities.colorPercentage(board, x, y, 2, id) -
@@ -146,15 +146,15 @@ for(int x=0; x<GomokuUtilities.NUMBER_OF_COLUMNS; x++){
 	  
 	  //Take a linear combination of the features, with every feature having a 
 	  //domain of ~[0,100]
-	  double[] w= {0.5,1,1.5, 3, 1.2,2.3,6};
-	 //double[] w= {0.5,1,1.5, 3, 0,0,0};
+	  double[] w= {0.5,1,1.5, 3, 2,4,10,50};
 	  int evaluation= (int)(
 			  w[0]*range2DColor + w[1]*range3DColor + w[2]*range4DColor +
 			  w[3]*(5*partakesIn5Tuples(x,y,board)) + 
 			  w[4]*(75*makesNTuples(2,x,y,board,id)) + 
 			  w[5]*(75*makesNTuples(3,x,y,board,id)) + 
-			  w[6]*(75*makesNTuples(4,x,y,board,id))
-			  );	  
+			  w[6]*(75*makesNTuples(4,x,y,board,id)) +
+			  w[7]*(75*makesNTuples(3,x,y,board,oppID()))
+			  );
 	  return evaluation;
   }
   
@@ -172,12 +172,12 @@ for(int x=0; x<GomokuUtilities.NUMBER_OF_COLUMNS; x++){
   int makesNTuples(int N, int x, int y, Board board, int pid) throws IllegalArgumentException{
 	  if(N<2 || N>5) throw new IllegalArgumentException("N out of bounds [2,5]!");
 	  final int[] owner= {pid};
-	  int[] lim= checkAreaAround(x,y,board, N, owner);
+	  int[] lim= checkAreaAround(x,y,board, N-1, owner);
 	  
 	  int row= (lim[0]+lim[1] >= N-1)?  1: 0;
-	  int column= (lim[2]+lim[3] >= 4)? 1: 0;
-	  int ldiag= (lim[4]+lim[5] >= 4)? 1: 0;
-	  int rdiag= (lim[6]+lim[7] >= 4)? 1: 0;
+	  int column= (lim[2]+lim[3] >= N-1)? 1: 0;
+	  int ldiag= (lim[4]+lim[5] >= N-1)? 1: 0;
+	  int rdiag= (lim[6]+lim[7] >= N-1)? 1: 0;
 	  return row+column+ldiag+rdiag;
   }
   
