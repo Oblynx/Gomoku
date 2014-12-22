@@ -146,14 +146,14 @@ for(int x=0; x<GomokuUtilities.NUMBER_OF_COLUMNS; x++){
 	  
 	  //Take a linear combination of the features, with every feature having a 
 	  //domain of ~[0,100]
-	  double[] w= {0.5,1,1.5, 3, 2,4,10,50};
+	  double[] w= {0.5,1,1.5, 3, 2,4,10,100};
 	  int evaluation= (int)(
 			  w[0]*range2DColor + w[1]*range3DColor + w[2]*range4DColor +
 			  w[3]*(5*partakesIn5Tuples(x,y,board)) + 
 			  w[4]*(75*makesNTuples(2,x,y,board,id)) + 
 			  w[5]*(75*makesNTuples(3,x,y,board,id)) + 
 			  w[6]*(75*makesNTuples(4,x,y,board,id)) +
-			  w[7]*(75*makesNTuples(3,x,y,board,oppID()))
+			  w[7]*(75*makesNTuples(4,x,y,board,oppID()))
 			  );
 	  return evaluation;
   }
