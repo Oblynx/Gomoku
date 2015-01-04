@@ -1,3 +1,4 @@
+package infrastructure;
 
 
 import javax.swing.JSlider;

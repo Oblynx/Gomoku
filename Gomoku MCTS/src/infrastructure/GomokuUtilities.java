@@ -1,3 +1,5 @@
+package infrastructure;
+
 /**
  *
  */
@@ -96,7 +98,25 @@ public class GomokuUtilities
 
   }
   
-  public static void playTile(Board board, int x, int y, int playerId)
+  public static Board cloneBoard (Board fullBoard)
+  {
+	  Board clone = new Board(true);
+
+	  for (int i = 0; i < fullBoard.getCols(); i++) {
+		  for (int j = 0; j < fullBoard.getRows(); j++) {
+			  Tile a = fullBoard.getTile(i,j);
+			  Tile tile =
+					  new Tile(a.getId(), a.getX(), a.getY(), a.getColor(), a.getMark(),a.getPlayerId());
+			  clone.setTile(tile);
+
+		  }
+	  }
+
+	  return clone;
+
+  }
+
+public static void playTile(Board board, int x, int y, int playerId)
   {
 	  if (!board.getIsClone()){
 		  System.out.println("The function playTile can only be used on a cloned Board");
@@ -266,6 +286,7 @@ public class GomokuUtilities
 
     System.setOut(realSystemOut);
   }
+  
   public static double colorPercentage(Board board, int x, int y, int radius, int player){
 	  if (radius < 2){
 		 // System.out.println("radius less than 2");
@@ -303,6 +324,7 @@ public class GomokuUtilities
 	  //System.out.println("normal return, numOfTiles="+numOfTiles+", playerTiles="+playerTiles);
 	  return (double)playerTiles/(double)numOfTiles;
   }
+  
   public static boolean checkForWin(int id, Board board){		
 		//check for win
 		//check horizontally

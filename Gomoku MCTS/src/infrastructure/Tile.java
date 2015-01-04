@@ -1,3 +1,4 @@
+package infrastructure;
 
 
 public class Tile implements Cloneable
