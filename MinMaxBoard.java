@@ -1,13 +1,8 @@
 class MinMaxBoard {
     int[][] board;
-    int availableMoves;
 
     MinMaxBoard(){
         board= new int[Const.columns][Const.rows];
-        availableMoves = Const.columns*Const.rows;
-        for(int i=0; i<Const.columns; i++)
-            for(int j=0; j<Const.rows; j++)
-                board[i][j]= 0; 
     }
 
     //Copy constructor
@@ -15,19 +10,25 @@ class MinMaxBoard {
         board= that.board.clone();
     }
 
-    /*
+    /**
       Evaluates current board. If the value is negative, then the opponent is in a better situation than us
       Else we are better. The bigger the absolute value, the better for the player who has the upper hand
       To do this we first check if any player has already won, or he has created a trap ( he will win for sure )
-      If it doesn't happen, we count the number of 4-3-2 in a row tiles, both ours and our opponent's, and we
+      If this doesn't happen, we count the number of 4-3-2 in a row tiles, both ours and our opponent's, and we
       take a linear combination of this info
-    */
+      @param plays : who plays now
+      @param me : who I am
+      @return explained before
+    **/
     int evaluate(int plays, int me) {
         int x, y, dep, player, dir, i;
         int[][] lim;
+        //win[i][player] -> Can player win in i moves?
         int[][] win = new int[4][3];
+        //tuple[i][player] -> How many tuples of length i does player have?
         int[][] tuple = new int[5][3];
 
+        //Calculate win and tuples
         for (x=0; x<Const.columns; ++x ) {
             for ( y=0; y<Const.rows; ++y ) {
                 //trap is already set
@@ -40,6 +41,7 @@ class MinMaxBoard {
                     for ( player=1; player<=2; ++player ) {
                         lim = checkAreaAround(x,y,player);
                         for ( dir=0; dir<8; ++dir ) {
+                            //If we have 4/3/2 in a row and they can make a 5-tuple
                             if ( lim[dir][0] >= 2 && lim[dir][0] <= 4 && lim[dir][2] + lim[(dir+4)%8][2] + 1 >= 5 ) {
                                 ++tuple[ lim[dir][0] ][player];
                             }
@@ -49,6 +51,7 @@ class MinMaxBoard {
             }
         }
 
+        //Check if somebody already won
         for ( dep=0; dep<3; ++dep ) {
             //If the one who plays has a trap at least as good as the other player, he won
             if ( win[dep][plays] > 0 ) {
@@ -61,7 +64,7 @@ class MinMaxBoard {
         }
 
         //Enough with the traps, let's just check 4 in a row, 3 in a row, 2 in a row
-        int[] w = {0,0,10,33,100};
+        int[] w = {0,0,5,33,100};
         int eval = 0;
         for ( i=2; i<=4; ++i ) {
             eval += w[i] * ( tuple[i][me] - tuple[i][oppID(me)] );
@@ -73,6 +76,9 @@ class MinMaxBoard {
         board[ move[0] ][ move[1] ] = pid;
     }
 
+    /**
+       Check if in-bounds and returns the player who played this Tile, zero if it is free
+    */
     int getColor(int x, int y){
         if (x < 0 || x >= Const.columns || y < 0 || y >= Const.rows)
             return -1;
@@ -83,7 +89,12 @@ class MinMaxBoard {
         return id==1?2:1;
     }
 
-    //Returns 3 if there is no trap, else the depth (remaining moves) to win ( 0,1 or 2 )
+    /**Returns 3 if there is no trap, else the depth (remaining moves) to win ( 0,1 or 2 )
+       @param x : x-coordinate
+       @param y : y-coondinate
+       @param id : the player we want to check for winning traps
+       @return explained before
+    */
     int trap (int x, int y, int id) {
         int[][] lim = checkAreaAround(x,y,id);
         int dir, trap;
@@ -136,7 +147,26 @@ class MinMaxBoard {
         return ans;
     }
 
-    //Takes part in 5-tuples
+    /**@param x : x coordinate
+       @param y : y coordinate
+       @return Does it touches some other tile ( or is in a preoccupied tile ) ?
+    */
+    boolean near ( int x, int y ) {
+        int i, j;
+
+        for ( i=Math.max(0,x-1); i<=Math.min(x+1,Const.columns-1); ++i ) {
+            for ( j=Math.max(0,y-1); j<=Math.min(y+1,Const.rows-1); ++j ) {
+                if ( board[i][j] != 0 ) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**Takes part in 5-tuples
+     */
     int partakesIn5Tuples(int x, int y,int id,int[][] lim) {
         int ans, tmp, dir;
 
@@ -149,10 +179,10 @@ class MinMaxBoard {
         return ans;
     }
     
-    /*
-     * lim[i][1] -> how many of pid in i direction
-     * lim[i][2] -> how many free after that in i direction
-     * lim[i][3] -> how many ( mixed mine and free ) until we hit wall
+    /**
+     * lim[i][0] -> how many of pid in i direction
+     * lim[i][1] -> how many free after that in i direction
+     * lim[i][2] -> how many ( mixed mine and free ) until we hit wall ( opponent or out of bounds )
      */
     int[][] checkAreaAround(int x,int y, int pid){
         int[][] lim= new int[8][3];
@@ -160,10 +190,11 @@ class MinMaxBoard {
         int i, dir, xt, yt, xPrev, yPrev, prevColor;
 
         //All directions
+        int bound = 4;
         prevColor = board[move[0]][move[1]];
         board[move[0]][move[1]] = pid;
         for ( dir=0; dir<8; ++dir ) {
-            for ( i=1; i<=5 ;++i ) {
+            for ( i=1; i<=bound ;++i ) {
                 xt = x + i*Const.dx[dir];
                 yt = y + i*Const.dy[dir];
                 xPrev = xt - Const.dx[dir];
@@ -182,7 +213,7 @@ class MinMaxBoard {
             }
 
             lim[dir][2] = lim[dir][0] + lim[dir][1];
-            for ( ;i<=5;++i ) {
+            for ( ;i<=bound;++i ) {
                 xt = x + i*Const.dx[dir];
                 yt = y + i*Const.dy[dir];
                 if ( xt<0 || xt >= Const.columns || yt<0 || yt >= Const.rows || getColor(xt,yt) == oppID(pid) ) {
