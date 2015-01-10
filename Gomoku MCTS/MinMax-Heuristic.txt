@@ -1,2 +1,0 @@
-MinMax-Heuristic
-0-1
