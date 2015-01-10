@@ -29,6 +29,8 @@ public class MinMaxPlayer implements AbstractPlayer
   
     public int oppID() {return (id==1)? 2: 1;}
 
+    //First value is true if it is our first move.
+    //Second value is true if I play before my opponent ( black tiles )
     private boolean[] checkFirstMove( Board b ) {
 	int x, y, moves;
 	boolean[] ans = new boolean[2];
@@ -47,6 +49,11 @@ public class MinMaxPlayer implements AbstractPlayer
 	return ans;
     }
 
+    /*
+      If it is the first move, play at the center.
+      Else do a minmax algorithm.
+      If minmax reports that some player has a trap set, then we switch to the evaluation function of part B, since it is sufficient, no need for the big insight of minmax
+     */
     public int[] getNextMove ( Board b )
     {
 	//Update board
@@ -98,6 +105,11 @@ public class MinMaxPlayer implements AbstractPlayer
 	}
     }
 
+    /* The main minmax algorithm, with AB-pruning
+       No need to store the entire tree. It suffices to hold the nodes currently in my path, using a depth first search.
+       Depth first search also gives the advantage that i don't need to store the current board for every Node.
+       It suffices to have one, global, board, and to change it as I visit some node. When I finish with it, I undo the work i've done, and i'm back to the old board.
+    */
     private int[] DFS (int dep, int a, int b)
     {
 	int[] ans = new int[3];

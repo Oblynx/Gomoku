@@ -15,15 +15,13 @@ class MinMaxBoard {
 	board= that.board.clone();
     }
 
-    /* Check if is already played and return an error
-       void makeMove(int[] move, int pid) throws IllegalArgumentException{
-       if (board[move[0]][move[1]] == 0) board[move[0]][move[1]]= pid;
-       else throw new IllegalArgumentException("Made move on occupied tile!!");
-       n       }
-
-       But we prefer not checking, so that we can revert the board to it's previous state
+    /*
+    Evaluates current board. If the value is negative, then the opponent is in a better situation than us
+    Else we are better. The bigger the absolute value, the better for the player who has the upper hand
+    To do this we first check if any player has already won, or he has created a trap ( he will win for sure )
+    If it doesn't happen, we count the number of 4-3-2 in a row tiles, both ours and our opponent's, and we
+    take a linear combination of this info
     */
-
     int evaluate(int plays, int me) {
 	int x, y, dep, player, dir, i;
 	int[][] lim;
@@ -73,18 +71,8 @@ class MinMaxBoard {
 	
     void makeMove(int[] move, int pid) {
 	board[ move[0] ][ move[1] ] = pid;
-	if ( pid == 0 ) {
-	    ++availableMoves;
-	}
-	else {
-	    --availableMoves;
-	}
     }
 
-    int getAvailableMoves() {
-	return availableMoves;
-    }
-    
     int getColor(int x, int y){
 	if (x < 0 || x >= Const.columns || y < 0 || y >= Const.rows)
 	    return -1;
@@ -95,6 +83,7 @@ class MinMaxBoard {
 	return id==1?2:1;
     }
 
+    //Returns 3 if there is no trap, else the depth (remaining moves) to win ( 0,1 or 2 )
     int trap (int x, int y, int id) {
 	int[][] lim = checkAreaAround(x,y,id);
 	int dir, trap;
@@ -147,7 +136,8 @@ class MinMaxBoard {
 	return ans;
     }
 
-    int partakesIn5Tuples(int x, int y,int id,int[][] lim) throws IllegalArgumentException{
+    //Takes part in 5-tuples
+    int partakesIn5Tuples(int x, int y,int id,int[][] lim) {
 	int ans, tmp, dir;
 
 	ans = 0;
