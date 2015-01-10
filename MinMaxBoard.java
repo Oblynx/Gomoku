@@ -154,8 +154,8 @@ class MinMaxBoard {
     boolean near ( int x, int y ) {
         int i, j;
 
-        for ( i=Math.max(0,x-1); i<=Math.min(x+1,Const.columns-1); ++i ) {
-            for ( j=Math.max(0,y-1); j<=Math.min(y+1,Const.rows-1); ++j ) {
+        for ( i=Math.max(0,x-Const.near); i<=Math.min(x+Const.near,Const.columns-1); ++i ) {
+            for ( j=Math.max(0,y-Const.near); j<=Math.min(y+Const.near,Const.rows-1); ++j ) {
                 if ( board[i][j] != 0 ) {
                     return true;
                 }

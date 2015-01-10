@@ -6,4 +6,6 @@ class Const {
     static int[] dy = {1,1,0,-1,-1,-1,0,1};
     //Maximum depth of MiniMax algorithm
     static int maxDepth = 2;
+    //How near to a preocuppied tile shall a new tile be placed?
+    static int near = 2;
 }
