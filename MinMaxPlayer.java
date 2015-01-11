@@ -103,78 +103,91 @@ public class MinMaxPlayer implements AbstractPlayer
     private int[] DFS (int dep, int a, int b)
     {
         int[] ans = new int[3];
-        int evaluate = board.evaluate( dep%2==0 ?id :oppID() ,id);
+        int plays = dep % 2 == 0 ? id : oppID();
+        int evaluate = board.evaluate( plays ,id);
 
         if ( dep == Const.maxDepth || evaluate == Integer.MAX_VALUE || evaluate == Integer.MIN_VALUE ) {
             ans[2] = evaluate;
             return ans;
         }
 
-        int x, y, tmp;
+        int x, y, tmp, dir, xt, yt, distance, i, size, children;
         int[] move = new int[2];
+
+        ans[2] = plays == id ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+
+        //BFS to find all children which are near, the other are useless
+        int[][] queue = new int[Const.columns*Const.rows][2];
+        int[][] dist = new int[Const.columns][Const.rows];
+        size = 0;
+        for ( x=0; x<Const.columns; ++x ) {
+            for ( y=0; y<Const.rows; ++y ) {
+                if ( board.getColor(x,y) != 0 ) {
+                    queue[size][0] = x;
+                    queue[size][1] = y;
+                    ++size;
+                    dist[x][y] = 1;
+                }
+            }
+        }
+        children = size; //Children go from queue[children] to queue[size-1]
         
-        //If maximizer
-        if ( dep % 2 == 0 ) {
-            ans[2] = Integer.MIN_VALUE;
-            //all children which touch a tile, the other are useless
-            for ( x=0; x<Const.columns; ++x ) {
-                for ( y=0; y<Const.rows; ++y ) {
-                    if ( board.getColor(x,y)==0 && board.near(x,y) ) {
-                        //update board
-                        move[0] = x; move[1] = y;
-                        board.makeMove(move,id);
-
-                        //go to child and update values
-                        tmp = DFS(dep+1,a,b)[2];
-                        if ( tmp > ans[2] ) {
-                            ans[0] = x; ans[1] = y; ans[2] = tmp;
-                        }
-                        a = Math.max ( a, ans[2] );
-
-                        //undo move
-                        board.makeMove(move,0);
-
-                        //a-b pruning
-                        if ( b <= a ) {
-                            return ans;
-                        }
-                    }
+        for ( i=0; i<size; ++i ) {
+            x = queue[i][0];
+            y = queue[i][1];
+            distance = dist[x][y];
+            if ( distance == Const.near + 1 ) {
+                //distance = near+1 means near-tiles-away from original tiles ( their dist is 1 )
+                break;
+            }
+            
+            for ( dir=0; dir<8; ++dir ) {
+                xt = x + Const.dx[dir];
+                yt = y + Const.dy[dir];
+                if ( board.getColor(xt,yt) == 0 && dist[xt][yt] == 0 ) {
+                    queue[size][0] = xt;
+                    queue[size][1] = yt;
+                    ++size;
+                    dist[xt][yt] = distance + 1;
                 }
             }
-            return ans;
         }
-        //minimizer
-        else {
-            ans[2] = Integer.MAX_VALUE;
-            //all children which touch a tile, the other are useless            
-            for ( x=0; x<Const.columns; ++x ) {
-                for ( y=0; y<Const.rows; ++y ) {
-                    if ( board.getColor(x,y) == 0 && board.near(x,y) ) {
-                        //update board
-                        move[0] = x; move[1] = y;
-                        board.makeMove(move,oppID());
 
-                        //go to child and update values
-                        tmp = DFS(dep+1,a,b)[2];
-                        if ( tmp < ans[2] ) {
-                            ans[0] = x; ans[1] = y; ans[2] = tmp;
-                        }
-                        b = Math.min ( b, ans[2] );
+        //Found children, visit them all ( dfs )
+        for ( i=children; i<size; ++i ) {
+            x = queue[i][0];
+            y = queue[i][1];
+            //update board
+            move[0] = x; move[1] = y;
+            board.makeMove(move,plays);
 
-                        //undo move
-                        board.makeMove(move,0);
-
-                        //a-b pruning
-                        if ( b <= a ) {
-                            return ans;
-                        }
-                    }
+            //go to child and update values
+            tmp = DFS(dep+1,a,b)[2];
+            if ( plays == id ) {
+                //maximizer
+                if ( tmp > ans[2] ) {
+                    ans[0] = x; ans[1] = y; ans[2] = tmp;
                 }
+                a = Math.max ( a, ans[2] );
             }
-            return ans;   
+            else {
+                //minimizer
+                if ( tmp < ans[2] ) {
+                    ans[0] = x; ans[1] = y; ans[2] = tmp;
+                }
+                b = Math.min( b, ans[2] );
+            }
+
+            //undo move
+            board.makeMove(move,0);
+
+            //a-b pruning
+            if ( b <= a ) {
+                return ans;
+            }
         }
+        return ans;
     }
-
 
     /**
        @param b : Gomoku Board

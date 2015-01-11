@@ -147,24 +147,6 @@ class MinMaxBoard {
         return ans;
     }
 
-    /**@param x : x coordinate
-       @param y : y coordinate
-       @return Does it touches some other tile ( or is in a preoccupied tile ) ?
-    */
-    boolean near ( int x, int y ) {
-        int i, j;
-
-        for ( i=Math.max(0,x-Const.near); i<=Math.min(x+Const.near,Const.columns-1); ++i ) {
-            for ( j=Math.max(0,y-Const.near); j<=Math.min(y+Const.near,Const.rows-1); ++j ) {
-                if ( board[i][j] != 0 ) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
     /**Takes part in 5-tuples
      */
     int partakesIn5Tuples(int x, int y,int id,int[][] lim) {
